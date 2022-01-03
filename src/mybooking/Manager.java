@@ -8,14 +8,9 @@ import java.util.Scanner;
  * @author @author Stefanos Ifoulis (AEM: 3998)
  */
 
-public class Manager {
+public class Manager extends User {
 
-    private String name;
     private String lastName;
-    private String email;
-    private final String username;
-    private final String password;
-    private final int personalPin;
     public ArrayList <Customer> customersWaitingList;
     public ArrayList <AcProvider> AcProvidersWaitingList;
 
@@ -24,39 +19,18 @@ public class Manager {
      * @param name The name of the manager.
      * @param lastName The last name of the manager.
      * @param email The email of the manager.
-     * @param user The username of the manager.
-     * @param pass The password of the manager.
-     * @param pin The personal confirmation pin of the manager.
+     * @param username The username of the manager.
+     * @param password The password of the manager.
+     * @param personalPin The personal confirmation pin of the manager.
      */
 
-    public Manager (String name, String lastName, String email, String user, String pass, int pin) {
-        this.name = name;
+    public Manager (String name, String lastName, String email, String username, String password, int personalPin) {
+        super(name, email, username, password, personalPin);
         this.lastName = lastName;
-        this.email = email;
-        username = user;
-        password = pass;
-        personalPin = pin;
         customersWaitingList = new ArrayList<>();
         AcProvidersWaitingList = new ArrayList<>();
     }
-
-    /**
-     * @return Managers name.
-     */
-
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Refactors managers name.
-     * @param name Managers name.
-     */
-
-    public void setName (String name) {
-        this.name = name;
-    }
-
+    
     /**
      * @return Managers last name.
      */
@@ -73,56 +47,7 @@ public class Manager {
     public void setLastName (String lastName) {
         this.lastName = lastName;
     }
-
-    /**
-     * @return Managers email.
-     */
-
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Refactors managers email.
-     * @param email Managers email.
-     */
-
-    public void setEmail (String email) {
-        this.email = email;
-    }
-
-    /**
-     * Verifies the user through his personal pin.
-     * @return True if the user is verified and false otherwise.
-     */
-
-    public boolean personalPinConfirmation () {
-        Scanner myScan = new Scanner(System.in);
-        for (int i=3; i>0; i--) {
-            System.out.print("Insert your confirmation pin: ");
-            int pin = myScan.nextInt();
-            if (pin==personalPin) {
-                return true;
-            }
-            else {
-                System.out.println("Wrong confirmation pin. Please try again");
-                System.out.println("You have "+ (i-1) +" more tries.");
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Verifies the user through his username and password.
-     * @param user The given username.
-     * @param pass The given password.
-     * @return True if the given username and password match with the managers username and password.
-     */
     
-    public boolean checkLogInInfo (String user, String pass) {
-        return user.equals(username) && pass.equals(password);
-    }
-
     /**
      * Searches for the booking with the given name, inside the given list of bookings and prints its information.
      * @param myBookings The given list of bookings.
@@ -162,7 +87,7 @@ public class Manager {
     
     public void findAcProvider (ArrayList <AcProvider> providers, String AcProviderInfo) {
         for (AcProvider user : providers) {
-            if ((user.getName().equalsIgnoreCase(AcProviderInfo)) || (user.getBase().equalsIgnoreCase(AcProviderInfo)) || ( user.getEmail().equalsIgnoreCase(AcProviderInfo)) || (user.getPhoneNumber().equalsIgnoreCase(AcProviderInfo))) {
+            if ((user.getName().equalsIgnoreCase(AcProviderInfo)) || (user.getAddress().equalsIgnoreCase(AcProviderInfo)) || ( user.getEmail().equalsIgnoreCase(AcProviderInfo)) || (user.getPhoneNumber().equalsIgnoreCase(AcProviderInfo))) {
                 user.printAcProvidersInfo();
                 return;
             }

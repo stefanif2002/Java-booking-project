@@ -50,7 +50,33 @@ private ArrayList <SubBooking> everyBooking;
         everyBooking = new ArrayList<>();
         manager = m;
     }
+    
+    public void addCustomer (Customer a) {
+        customers.add(a);
+    }
+    
+    public void addProvider (AcProvider a) {
+        AcProviders.add(a);
+    } 
 
+    /**
+     * Removes the given customer form the customers list.
+     * @param temp The customer that is going to be deleted.
+     */
+
+    public void removeCustomer (Customer temp) {
+        customers.remove(temp);
+    }
+
+    /**
+     * Removes the given accommodation provider form the customers list.
+     * @param temp The accommodation provider that is going to be deleted.
+     */
+
+    public void removeAcProvider (AcProvider temp) {
+        AcProviders.remove(temp);
+    }
+    
     /**
      * @return List of customers.
      */
@@ -76,125 +102,13 @@ private ArrayList <SubBooking> everyBooking;
     }
 
     /**
-     * Customer sign-up interface.
-     * @return The new customer.
-     */
-    
-    public Customer createCustomer () {
-        Scanner myScan = new Scanner(System.in);
-        String name, lastName, address, email, username, password, dateOfBirth, passwordCheck;
-        String phoneNumber;
-        int id, pin;
-        double balance;
-        boolean b = true;
-        password = "aaa";
-        passwordCheck = "ooo";
-        username = "iii";
-        System.out.print("Please insert your name: ");
-        name = myScan.nextLine();
-        System.out.print("Please insert your last name: ");
-        lastName = myScan.nextLine();
-        System.out.print("Please insert your email: ");
-        email = myScan.nextLine();
-        System.out.print("Please insert your address: ");
-        address = myScan.nextLine();
-        System.out.print("Please insert your phoneNumber: ");
-        phoneNumber = myScan.nextLine();
-        System.out.print("Please insert your id: ");
-        id = myScan.nextInt();
-        myScan.nextLine();
-        System.out.print("Please insert your date of birth: ");
-        dateOfBirth = myScan.nextLine();
-        while (b) {
-            System.out.print("Please insert your preferred username: ");
-            username = myScan.nextLine();
-            b = usernameExists("provider",username) ;
-        }
-        while (!password.equals(passwordCheck)) {
-            System.out.print("Please insert your preferred password: ");
-            password = myScan.nextLine();
-            System.out.print("Please insert your preferred password again: ");
-            passwordCheck = myScan.nextLine();
-            if (!password.equals(passwordCheck))
-                System.out.println("Passwords don't match, try again");
-        }
-        System.out.print("Please insert your bank account balance: ");
-        balance = myScan.nextDouble();
-        System.out.print("Please insert your personal payment confirmation pin: ");
-        pin = myScan.nextInt();
-        Customer a = new Customer (name, lastName, address, email, username, password, phoneNumber, dateOfBirth, id, balance, pin);
-        customers.add(a);
-        return a;
-    }
-
-    /**
-     * Accommodation provider sign-up interface.
-     * @return The new accommodation provider.
-     */
-    
-    public AcProvider createAcProvider () {
-        Scanner myScan = new Scanner(System.in);
-        String name, base, email, username, password, passwordCheck;
-        String phoneNumber;
-        boolean b = true;
-        password = "aaa";
-        passwordCheck = "ooo";
-        username = "iii";
-        int pin;
-        System.out.print("Please insert the name of your business: ");
-        name = myScan.nextLine();
-        System.out.print("Please insert the address of your business: ");
-        base = myScan.nextLine();
-        System.out.print("Please insert your email: ");
-        email = myScan.nextLine();
-        System.out.print("Please insert your phoneNumber: ");
-        phoneNumber = myScan.nextLine();
-        while (b) {
-            System.out.print("Please insert your preferred username: ");
-            username = myScan.nextLine();
-            b = usernameExists("provider",username) ;
-        }
-        while (!password.equals(passwordCheck)) {
-            System.out.print("Please insert your preferred password: ");
-            password = myScan.nextLine();
-            System.out.print("Please insert your preferred password again: ");
-            passwordCheck = myScan.nextLine();
-            if (!password.equals(passwordCheck))
-                System.out.println("Passwords don't match, try again");
-        }
-        System.out.print("Please insert your personal confirmation pin: ");
-        pin = myScan.nextInt();
-        AcProvider a = new AcProvider (name, base, email, username, password, phoneNumber, pin);
-        AcProviders.add(a);
-        return a;
-    }
-
-    /**
-     * Removes the given customer form the customers list.
-     * @param temp The customer that is going to be deleted.
-     */
-
-    public void removeCustomer (Customer temp) {
-        customers.remove(temp);
-    }
-
-    /**
-     * Removes the given accommodation provider form the customers list.
-     * @param temp The accommodation provider that is going to be deleted.
-     */
-
-    public void removeAcProvider (AcProvider temp) {
-        AcProviders.remove(temp);
-    }
-
-    /**
      * Checks whether the given username exists or not.
      * @param type The type of user for which check is needed (customer or provider).
      * @param name The given username.
      * @return True if the username exists otherwise returns false.
      */
 
-    private boolean usernameExists(String type, String name) {
+    public boolean usernameExists(String type, String name) {
         if (type.equals("customer")) {
             for (Customer a : customers) {
                 if (a.getUsername().equals(name)) {
@@ -336,7 +250,7 @@ private ArrayList <SubBooking> everyBooking;
      * @param tA The time of Arrival.
      */
 
-    public void addSubBooking (String bN, String cN, String aN, int b, int e, int tA) {
+    public void addSubBooking (String bN, String cN, Accommodation aN, int b, int e, int tA) {
         SubBooking temp = new SubBooking (bN, cN, aN, b, e, tA);
         everyBooking.add(temp);
     }

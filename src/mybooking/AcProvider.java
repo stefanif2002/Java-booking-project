@@ -9,205 +9,26 @@ import java.util.Scanner;
  * @author Stefanos Ifoulis (AEM: 3998)
  */
 
-public class AcProvider {
+public class AcProvider extends SubUser{
 
 public ArrayList <Accommodation> myAc;
-private String name;
-private String base;
-private String email;
-private String username;
-private String password;
-private String phoneNumber;
-private final int personalPin;
 private ArrayList <SubBooking> myB;
-private boolean access;
-private boolean checked;
 
     /**
      * Constructor that initializes the providers information.
      * @param name The name of the provider.
-     * @param base The last name of the provider.
+     * @param address The last name of the provider.
      * @param email The email of the provider.
-     * @param user The username of the provider.
-     * @param pass The password of the provider.
+     * @param username The username of the provider.
+     * @param password The password of the provider.
      * @param phoneNumber The phone number of the provider.
-     * @param pin The personal confirmation pin of the provider.
+     * @param personalPin The personal confirmation pin of the provider.
      */
 
-    public AcProvider (String name, String base, String email, String user, String pass, String phoneNumber, int pin) {
+    public AcProvider (String name, String address, String email, String username, String password, String phoneNumber, int personalPin) {
+        super(name, email, username, password, personalPin, address, phoneNumber);
         myAc = new ArrayList <> ();
         myB = new ArrayList <> ();
-        this.name = name;
-        this.base = base;
-        this.email = email;
-        username = user;
-        password = pass;
-        this.phoneNumber = phoneNumber;
-        personalPin = pin;
-        access = false;
-        checked = false;
-    }
-
-    /**
-     * Refactors providers phone.
-     * @param phone Providers phone.
-     */
-    
-    public void setPhoneNumber (String phone) {
-        phoneNumber = phone;
-    }
-
-    /**
-     * @return Providers phone.
-     */
-    
-    public String getPhoneNumber () {
-        return phoneNumber;
-    }
-
-    /**
-     * Refactors providers email.
-     * @param email Providers email.
-     */
-    
-    public void setEmail (String email) {
-        this.email = email;
-    }
-
-    /**
-     * @return Providers email.
-     */
-    
-    public String getEmail () {
-        return email;
-    }
-
-    /**
-     * Refactors providers username.
-     * @param user Providers username.
-     */
-    
-    private void setUsername (String user) {
-        username = user;
-    }
-
-    /**
-     * @return Managers name.
-     */
-
-    public String getUsername () {
-        return username;
-    }
-
-    /**
-     * Refactors providers password.
-     * @param pass Providers password.
-     */
-    
-    private void setPassword (String pass) {
-        password = pass;
-    }
-
-    /**
-     * Refactors providers username or password.
-     * @param a Type of change, username or password.
-     * @param b Providers username or password.
-     */
-    
-    public void changeLoginInfo (String a, String b) {
-        switch (a) {
-            case "username" -> this.setUsername(b);
-            case "password" -> this.setPassword(b);
-            default -> System.out.println("Wrong Input");
-        }
-    }
-
-    /**
-     * Refactors providers username and password.
-     * @param a Does nothing, just helps differ for the other changeLoginInfo(...) method.
-     * @param b Providers username.
-     * @param c Providers password.
-     */
-    
-    public void changeLoginInfo (String a, String b, String c) {
-        this.setUsername(b);
-        this.setPassword(c);
-    }
-
-    /**
-     * Verifies the user through his username and password.
-     * @param user The given username.
-     * @param pass The given password.
-     * @return True if the given username and password match with the providers username and password.
-     */
-    
-    public boolean checkLogInInfo (String user, String pass) {
-        return user.equals(username) && pass.equals(password);
-    }
-
-    /**
-     * Refactors providers name.
-     * @param name Providers name.
-     */
-    
-    public void setName (String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return Providers name.
-     */
-    
-    public String getName () {
-        return name;
-    }
-
-    /**
-     * Refactors providers name.
-     * @param base Providers name.
-     */
-    
-    public void setBase (String base) {
-        this.base = base;
-    }
-
-    /**
-     * @return Providers base.
-     */
-    
-    public String getBase () {
-        return base;
-    }
-
-    /**
-     * Changes the status of the user according to the managers approval or denial.
-     * @param temp True if the manager approved the user and false otherwise.
-     */
-    
-    public void application (boolean temp) {
-        checked = true;
-        access = temp;
-    }
-
-    /**
-     * Defines whether the user should gain access according to the access variable.
-     * @return 0 if the user has access, 1 if the user was rejected from the manager and
-     * 2 if the manager hasn't checked his application yet.
-     */
-    
-    public int statusReport () {
-        if (access){
-            System.out.println("\nWelcome!");
-            return 0;
-        }
-        else if (checked) {
-            System.out.println("Unfortunately your application was rejected, please try to re-enrol.");
-            return 1;
-        }
-        else {
-            System.out.println("Unfortunately the manager hasn't yet confirmed your application.");
-            return 2;
-        }
     }
 
     /**
@@ -216,37 +37,13 @@ private boolean checked;
 
     public void printAcProvidersInfo () {
         System.out.println("Customer info: ");
-        System.out.println("Name: " + name);
-        System.out.println("Base: " + base);
-        System.out.println("Phone number: " + phoneNumber);
-        System.out.println("Email: " + email);
+        super.printUsersInfo();
         if (myAc.isEmpty())
             return;
         System.out.println("\nProviders accommodations: ");
         for (Accommodation a: myAc) {
             a.printFullDescription();
         }
-    }
-
-    /**
-     * Verifies the user through his personal pin.
-     * @return True if the user is verified and false otherwise.
-     */
-    
-    public boolean personalPinConfirmation () {
-        Scanner myScan = new Scanner(System.in);
-        for (int i=3; i>0; i--) {
-            System.out.print("Insert your confirmation pin: ");
-            int pin = myScan.nextInt();
-            if (pin==personalPin) {
-                return true;
-            }
-            else {
-                System.out.println("Wrong confirmation pin. Please try again");
-                System.out.println("You have "+ (i-1) +" more tries.");
-            }
-        }
-        return false;
     }
 
     /**
@@ -340,7 +137,7 @@ private boolean checked;
     
     public void reservationConf (Accommodation n, String costumerName,  int b, int e, int tA) {
         n.changeAvailability(b, e, false);
-        SubBooking t = new SubBooking (n.getAcName() + " - " + costumerName, costumerName, n.getAcName(), b, e, tA);
+        SubBooking t = new SubBooking (n.getAcName() + " - " + costumerName, costumerName, n, b, e, tA);
         myB.add(t);
     }
 

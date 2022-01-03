@@ -9,70 +9,36 @@ import java.util.Scanner;
  * @author Stefanos Ifoulis (AEM: 3998)
  */
 
-public class Customer {
+public class Customer extends SubUser {
 
-private String name;
 private String lastName;
 private String dateOfBirth;
 private int id;
 private double balance;
-private final int paymentAccountPin;
-private final String address;
-private String phoneNumber;
-private String email;
-private String username;
-private String password;
 private LinkedList <Booking> myBookings;
-private boolean access;
-private boolean checked;
 
     /**
      * Constructor that initializes the customers information.
      * @param name The name of the customer.
      * @param lastName The last name of the customer.
-     * @param ad The address of the customer.
+     * @param address The address of the customer.
      * @param email The email of the customer.
-     * @param user The username of the customer.
-     * @param pass The password of the customer.
+     * @param username The username of the customer.
+     * @param password The password of the customer.
      * @param phoneNumber The phone number of the customer.
      * @param d The date of birth of the customer.
      * @param i The id of the customer.
      * @param pay The bank account balance of the customer.
-     * @param pin The personal confirmation pin of the customer.
+     * @param personalPin The personal confirmation pin of the customer.
      */
 
-    public Customer (String name, String lastName, String ad, String email, String user, String pass, String phoneNumber, String d, int i, double pay, int pin) {
+    public Customer (String name, String lastName, String address, String email, String username, String password, String phoneNumber, String d, int i, double pay, int personalPin) {
+        super(name, email, username, password, personalPin, address, phoneNumber);
         this.myBookings = new LinkedList <> ();
-        this.name = name;
         this.lastName = lastName;
         dateOfBirth = d;
         id = i;
         balance = pay;
-        paymentAccountPin = pin;
-        address = ad;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        username = user;
-        password = pass;
-        checked = false;
-        access = false;
-    }
-
-    /**
-     * Refactors customers name.
-     * @param n Customers name.
-     */
-
-    public void setName (String n) {
-        name = n;
-    }
-
-    /**
-     * @return Customers name.
-     */
-    
-    public String getName () {
-        return name;
     }
 
     /**
@@ -128,142 +94,7 @@ private boolean checked;
     public double getBalance () {
         return balance;
     }
-
-    /**
-     * @return Customers address.
-     */
-
-    public String getAddress () {
-        return address;
-    }
-
-    /**
-     * Refactors customers phone number.
-     * @param phone Customers phone number.
-     */
     
-    public void setPhoneNumber (String phone) {
-        phoneNumber = phone;
-    }
-
-    /**
-     * @return Customers phone number.
-     */
-    
-    public String getPhoneNumber () {
-        return phoneNumber;
-    }
-
-    /**
-     * Refactors customers email.
-     * @param e Customers email.
-     */
-    
-    public void setEmail (String e) {
-        email = e;
-    }
-
-    /**
-     * @return Customers email.
-     */
-    
-    public String getEmail () {
-        return email;
-    }
-
-    /**
-     * Refactors customers username.
-     * @param user Customers username.
-     */
-    
-    private void setUsername (String user) {
-        username = user;
-    }
-
-    /**
-     * @return Customers username.
-     */
-
-    public String getUsername () {
-        return username;
-    }
-
-    /**
-     * Refactors customers password.
-     * @param pass Customers password.
-     */
-    
-    private void setPassword (String pass) {
-        password = pass;
-    }
-
-    /**
-     * Refactors customers username or password.
-     * @param a Type of change, username or password.
-     * @param b Customers username or password.
-     */
-
-    public void changeLoginInfo (String a, String b) {
-        switch (a) {
-            case "username" -> this.setUsername(b);
-            case "password" -> this.setPassword(b);
-            default -> System.out.println("Wrong Input");
-        }
-    }
-
-    /**
-     * Refactors customers username and password.
-     * @param a Does nothing, just helps differ for the other changeLoginInfo(...) method.
-     * @param b Customers username.
-     * @param c Customers password.
-     */
-    
-    public void changeLoginInfo (String a, String b, String c) {
-        this.setUsername(b);
-        this.setPassword(b);
-    }
-
-    /**
-     * Changes the status of the user according to the managers approval or denial.
-     * @param temp True if the manager approved the user and false otherwise.
-     */
-    
-    public void application (boolean temp) {
-        checked = true;
-        access = temp;
-    }
-
-    /**
-     * Defines whether the user should gain access according to the access variable.
-     * @return 0 if the user has access, 1 if the user was rejected from the manager and
-     * 2 if the manager hasn't checked his application yet.
-     */
-    
-    public int statusReport () {
-        if (access){
-            System.out.println("\nWelcome!");
-            return 0;
-        }
-        else if (checked) {
-            System.out.println("Unfortunately your application was rejected, please try to re-enrol.");
-            return 1;
-        }
-        else {
-            System.out.println("Unfortunately the manager hasn't yet confirmed your application.");
-            return 2;
-        }
-    }
-
-    /**
-     * Verifies the user through his username and password.
-     * @param user The given username.
-     * @param pass The given password.
-     * @return True if the given username and password match with the providers username and password.
-     */
-    
-    public boolean checkLogInInfo (String user, String pass) {
-        return user.equals(username) && pass.equals(password);
-    }
 
     /**
      * Places a booking.
@@ -302,7 +133,7 @@ private boolean checked;
         for (int i=3; i>0; i--) {
             System.out.print("Insert your confirmation pin: ");
             int pin = myScan.nextInt();
-            if (pin==paymentAccountPin) {
+            if (pin==personalPin) {
                 return true;
             }
             else {
@@ -395,13 +226,10 @@ private boolean checked;
 
     public void printCustomerInfo () {
         System.out.println("Customer info: ");
-        System.out.println("Name: " + name);
+        super.printUsersInfo();
         System.out.println("Last name: " + lastName);
         System.out.println("Date of birth: " + dateOfBirth);
         System.out.println("Id: " + id);
-        System.out.println("Address: " + address);
-        System.out.println("Phone number: " + phoneNumber);
-        System.out.println("Email: " + email);
         System.out.println("Balance: " + balance);
         if (myBookings.isEmpty())
             return;

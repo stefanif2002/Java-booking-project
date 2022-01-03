@@ -9,60 +9,52 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * The JavaProject class contains the main method, the user interface and
- * a Storage type object, named a, which links it with the program. <br>
- * @author Stefanos Ifoulis (AEM: 3998)
+ *
+ * @author Dell i7
  */
-public class JavaProject {
-
-private final Storage a;
+public class UserInterface {
+    
+public final Storage a;
 private final Scanner myScan;
 
+    
     /**
      * Constructor initializes myScan and a.
+     * @param a The storage.
      */
 
-    public JavaProject() {
+    public UserInterface(Storage a) {
         this.myScan = new Scanner(System.in);
-        this.a = new Storage ("Name", "Last Name", "Email@gmail.com", "username", "password", 2021);
+        this.a = a;
     }
-    /**
-     * Main method, it contains the basic interface. <br>
-     * In particular determines, according to the user's input, the passage of control. <br>
-     * There are 3 main options: <br>
-     *      1. Log-in (types of users that can log-in: Customer, Accommodation provider or Manager). <br>
-     *      2. Sing-up (types of users that can sign-up: Customer or Accommodation provider). <br>
-     *      3. Exit. <br>
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        JavaProject project = new JavaProject ();
+    
+    public void mainMenuInterface() {
         String type = "aaa";
         System.out.println("\nWelcome!\n");
         while (!type.equals("exit")) {
             System.out.print("Do you wish to log-in, to sign up or exit (type log, sign or exit): ");
-            type = project.myScan.nextLine();
+            type = myScan.nextLine();
             switch (type) {
                 case "log" -> {
                     System.out.print("Please choose your log-in type, customer, Accommodation provider or Manager (type customer, provider or manager): ");
-                    type = project.myScan.nextLine();
+                    type = myScan.nextLine();
                     switch (type) {
-                        case "customer" -> project.customerLogIn();
-                        case "provider" -> project.AcProviderLogIn();
-                        case "manager" -> project.ManagerLogIn();
+                        case "customer" -> customerLogIn();
+                        case "provider" -> AcProviderLogIn();
+                        case "manager" -> ManagerLogIn();
                     }
                 }
                 case "sign" -> {
                     System.out.print("Please choose your sign up type, customer or Accommodation provider (type customer or provider): ");
-                    type = project.myScan.nextLine();
+                    type = myScan.nextLine();
                     if (type.equals("customer")) {
-                        Customer t = project.a.createCustomer();
-                        project.a.manager.customersWaitingList.add(t);
+                        Customer t = createCustomer();
+                        a.manager.customersWaitingList.add(t);
                         System.out.println("Your application has successfully placed, after the managers approval you will be able to log in.\n");
                     }
                     else if (type.equals("provider")) {
-                        AcProvider t = project.a.createAcProvider();
-                        project.a.manager.AcProvidersWaitingList.add(t);
+                        AcProvider t = createAcProvider();
+                        a.manager.AcProvidersWaitingList.add(t);
                         System.out.println("Your application has successfully placed, after the managers approval you will be able to log in.\n");
                     }
                 }
@@ -71,10 +63,102 @@ private final Scanner myScan;
             }
             System.out.println();
         }
-        
-        
+    }
+    
+    /**
+     * Customer sign-up interface.
+     * @return The new customer.
+     */
+    
+    public Customer createCustomer () {
+        Scanner myScan = new Scanner(System.in);
+        String name, lastName, address, email, username, password, dateOfBirth, passwordCheck;
+        String phoneNumber;
+        int id, pin;
+        double balance;
+        boolean b = true;
+        password = "aaa";
+        passwordCheck = "ooo";
+        username = "iii";
+        System.out.print("Please insert your name: ");
+        name = myScan.nextLine();
+        System.out.print("Please insert your last name: ");
+        lastName = myScan.nextLine();
+        System.out.print("Please insert your email: ");
+        email = myScan.nextLine();
+        System.out.print("Please insert your address: ");
+        address = myScan.nextLine();
+        System.out.print("Please insert your phoneNumber: ");
+        phoneNumber = myScan.nextLine();
+        System.out.print("Please insert your id: ");
+        id = myScan.nextInt();
+        myScan.nextLine();
+        System.out.print("Please insert your date of birth: ");
+        dateOfBirth = myScan.nextLine();
+        while (b) {
+            System.out.print("Please insert your preferred username: ");
+            username = myScan.nextLine();
+            b = a.usernameExists("provider",username) ;
+        }
+        while (!password.equals(passwordCheck)) {
+            System.out.print("Please insert your preferred password: ");
+            password = myScan.nextLine();
+            System.out.print("Please insert your preferred password again: ");
+            passwordCheck = myScan.nextLine();
+            if (!password.equals(passwordCheck))
+                System.out.println("Passwords don't match, try again");
+        }
+        System.out.print("Please insert your bank account balance: ");
+        balance = myScan.nextDouble();
+        System.out.print("Please insert your personal payment confirmation pin: ");
+        pin = myScan.nextInt();
+        Customer newC = new Customer (name, lastName, address, email, username, password, phoneNumber, dateOfBirth, id, balance, pin);
+        a.addCustomer(newC);
+        return newC;
     }
 
+    /**
+     * Accommodation provider sign-up interface.
+     * @return The new accommodation provider.
+     */
+    
+    public AcProvider createAcProvider () {
+        Scanner myScan = new Scanner(System.in);
+        String name, base, email, username, password, passwordCheck;
+        String phoneNumber;
+        boolean b = true;
+        password = "aaa";
+        passwordCheck = "ooo";
+        username = "iii";
+        int pin;
+        System.out.print("Please insert the name of your business: ");
+        name = myScan.nextLine();
+        System.out.print("Please insert the address of your business: ");
+        base = myScan.nextLine();
+        System.out.print("Please insert your email: ");
+        email = myScan.nextLine();
+        System.out.print("Please insert your phoneNumber: ");
+        phoneNumber = myScan.nextLine();
+        while (b) {
+            System.out.print("Please insert your preferred username: ");
+            username = myScan.nextLine();
+            b = a.usernameExists("provider",username) ;
+        }
+        while (!password.equals(passwordCheck)) {
+            System.out.print("Please insert your preferred password: ");
+            password = myScan.nextLine();
+            System.out.print("Please insert your preferred password again: ");
+            passwordCheck = myScan.nextLine();
+            if (!password.equals(passwordCheck))
+                System.out.println("Passwords don't match, try again");
+        }
+        System.out.print("Please insert your personal confirmation pin: ");
+        pin = myScan.nextInt();
+        AcProvider newAc = new AcProvider (name, base, email, username, password, phoneNumber, pin);
+        a.addProvider(newAc);
+        return newAc;
+    }
+    
     /**
      * The customer interface after the user logs-in. <br>
      * There are 7 main options: <br>
@@ -119,7 +203,7 @@ private final Scanner myScan;
                     if (a.AcSearch(name)) {
                             if (p.placeBooking(a.AcReturn(name), (beg-1), (end-1), time)) {
                             System.out.println("Booking successfully placed.");
-                            a.addSubBooking(name + " - " + p.getName(), p.getName(), name, (beg-1), (end-1), time );
+                            a.addSubBooking(name + " - " + p.getName(), p.getName(), a.AcReturn(name), (beg-1), (end-1), time );
                             }
                     }
                     else
@@ -424,10 +508,9 @@ private final Scanner myScan;
         System.out.println();
         System.out.println("Options: ");
         System.out.println("1st: Change your name (type name).");
-        System.out.println("2nd: Change your base (type base).");
-        System.out.println("3rd: Change your phone number (type phone).");
-        System.out.println("4th: Change your email (type email).");
-        System.out.println("5th: Change your username-password (type username or password or both).");
+        System.out.println("2nd: Change your phone number (type phone).");
+        System.out.println("3rd: Change your email (type email).");
+        System.out.println("4th: Change your username-password (type username or password or both).");
         System.out.print("Write your choice: ");
         choice = myScan.nextLine();
         if ("both".equals(choice)) {
@@ -450,7 +533,6 @@ private final Scanner myScan;
             n = myScan.nextLine();
             switch (choice) {
                 case "name" -> temp.setName(n);
-                case "base" -> temp.setBase(n);
                 case "email" -> temp.setEmail(n);
                 case "phone" -> temp.setPhoneNumber(n);
                 case "username" -> {
@@ -560,5 +642,4 @@ private final Scanner myScan;
         }
 
     }
-    
 }
