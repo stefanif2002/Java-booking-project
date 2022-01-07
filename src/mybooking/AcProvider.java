@@ -1,6 +1,5 @@
 package mybooking;
 
-import static java.lang.constant.ConstantDescs.NULL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -11,8 +10,8 @@ import java.util.Scanner;
 
 public class AcProvider extends SubUser{
 
-public ArrayList <Accommodation> myAc;
-private ArrayList <SubBooking> myB;
+public ArrayList <String> myAc;
+private ArrayList <String> myB;
 
     /**
      * Constructor that initializes the providers information.
@@ -23,34 +22,58 @@ private ArrayList <SubBooking> myB;
      * @param password The password of the provider.
      * @param phoneNumber The phone number of the provider.
      * @param personalPin The personal confirmation pin of the provider.
+     * @param access
+     * @param checked
+     * @param myAc
+     * @param myB
      */
 
-    public AcProvider (String name, String address, String email, String username, String password, String phoneNumber, int personalPin) {
-        super(name, email, username, password, personalPin, address, phoneNumber);
-        myAc = new ArrayList <> ();
-        myB = new ArrayList <> ();
+    public AcProvider (String name, String address, String email, String username, String password, String phoneNumber, int personalPin, boolean access, boolean checked, ArrayList <String> myAc, ArrayList <String> myB) {
+        super(name, email, username, password, personalPin, address, phoneNumber, access, checked);
+        this.myAc = myAc;
+        this.myB = myB;
+    }
+    
+    public AcProvider (String name, String address, String email, String username, String password, String phoneNumber, int personalPin, boolean access, boolean checked) {
+        super(name, email, username, password, personalPin, address, phoneNumber, access, checked);
+        this.myAc = new ArrayList <> ();
+        this.myB = new ArrayList <> ();
+    }
+    
+    public ArrayList <String> getMyBookings() {
+        return myB;
+    }
+    
+    public ArrayList <String> getAccommodations() {
+        return myAc;
     }
 
     /**
      * Prints the providers information.
+     * @param s
      */
 
-    public void printAcProvidersInfo () {
+    public void printAcProvidersInfo (Storage s) {
         System.out.println("Customer info: ");
         super.printUsersInfo();
         if (myAc.isEmpty())
             return;
         System.out.println("\nProviders accommodations: ");
-        for (Accommodation a: myAc) {
-            a.printFullDescription();
-        }
+        for (String a: myAc)
+            s.everyAccommodation.get(a).printFullDescription();
+    }
+    
+    public void printAcProviderForManager (Storage s) {
+        System.out.println("Providers info: ");
+        super.printUsersInfo();
     }
 
     /**
      * Method to create an accommodation.
+     * @param s
      */
 
-    public void accomCreate () {
+    public void accomCreate (Storage s) {
         Scanner myScan = new Scanner(System.in);
         if (this.personalPinConfirmation()) {
             String instName;
@@ -62,9 +85,10 @@ private ArrayList <SubBooking> myB;
             instPrice = myScan.nextDouble();
             System.out.print("Please insert the square meters of the accommodation: ");
             instSquare = myScan.nextInt();
-            Accommodation e = new Accommodation (instName, instPrice, instSquare, this);
+            Accommodation e = new Accommodation (instName, instPrice, instSquare, this.name);
             this.addAccServices(e);
-            myAc.add(e);
+            myAc.add(e.getAcName());
+            s.everyAccommodation.put(e.getAcName(), e);
         }
         else
             System.out.println("Inability to create accommodation due to wrong insertance of pin");
@@ -72,16 +96,18 @@ private ArrayList <SubBooking> myB;
 
     /**
      * Method to delete an accommodation.
+     * @param s
      */
     
-    public void accomDelete () {
+    public void accomDelete (Storage s) {
         Scanner myScan = new Scanner(System.in);
         if (this.personalPinConfirmation()) {
-            this.printAllAccommodations();
+            this.printAllAccommodations(s);
             String instName;
             System.out.print("Please insert the name of the accommodation: ");
             instName = myScan.nextLine();
-            myAc.remove(this.accomFind(instName));
+            myAc.remove(instName);
+            s.everyAccommodation.remove(instName);
         }
         else
             System.out.println("Inability to delete accommodation due to wrong insertance of pin");
@@ -90,15 +116,12 @@ private ArrayList <SubBooking> myB;
     /**
      * Method to determine whether an accommodation with the given name exists.
      * @param n The given name.
+     * @param s
      * @return True if an accommodation with the given name exists and false otherwise.
      */
     
-    public boolean accomExist (String n) {
-        for (Accommodation e : myAc) {
-            if (e.getAcName().equals(n))
-                return true;
-        }
-        return false;
+    public boolean accomExist (String n, Storage s) {
+        return s.everyAccommodation.containsKey(n) && myAc.contains(n);
     }
 
     /**
@@ -111,34 +134,29 @@ private ArrayList <SubBooking> myB;
     }
 
     /**
-     * Searches and returns the accommodation with the given name.
-     * This method should only be used after the "accomExist (String n)" method,
-     * o that it's ensured that the accommodation exists.
+     * Searches and returns the accommodation with the given name.This method should only be used after the "accomExist (String n)" method,
+ o that it's ensured that the accommodation exists.
      * @param n The name of the accommodation.
+     * @param s
      * @return The accommodation.
      */
     
-    public Accommodation accomFind (String n) {
-        for (Accommodation e : myAc) {
-            if (e.getAcName().equals(n))
-                return e;
-        }
-        return (Accommodation) NULL;
+    public Accommodation accomFind (String n, Storage s) {
+        return s.everyAccommodation.get(n);
     }
 
     /**
      * Confirms customers reservations.
      * @param n The accommodation.
-     * @param costumerName The name of the costumer.
+     * @param t
      * @param b The date of the arrival.
      * @param e The date of the departure.
      * @param tA The time of Arrival.
      */
     
-    public void reservationConf (Accommodation n, String costumerName,  int b, int e, int tA) {
+    public void reservationConf (Accommodation n, Booking t,  int b, int e, int tA) {
         n.changeAvailability(b, e, false);
-        SubBooking t = new SubBooking (n.getAcName() + " - " + costumerName, costumerName, n, b, e, tA);
-        myB.add(t);
+        myB.add(t.bookingName);
     }
 
     /**
@@ -151,12 +169,8 @@ private ArrayList <SubBooking> myB;
     
     public void reservationCancel (String bookingName, Accommodation n, int b, int e) {
         n.changeAvailability(b, e, true);
-        for (SubBooking a : myB) {
-            if (bookingName.equals(a.bookingName)) {
-                myB.remove(a);
-                return;
-            }
-        }
+        if (myB.contains(bookingName))
+            myB.remove(bookingName);
     }
 
     /**
@@ -179,57 +193,69 @@ private ArrayList <SubBooking> myB;
 
     /**
      * Prints accommodations for the customers.
+     * @param s
      */
 
-    public void printForCustomer () {
+    public void printForCustomer (Storage s) {
         int counter =0;
         if (myAc.isEmpty()) 
             return;
         System.out.println("Accommodation provider: " + name );
         System.out.println();
-        for (Accommodation temp : myAc) {
-            System.out.println("Accommodation " + (counter+1) + ": " + temp.getAcName());
+        for (String temp : myAc) {
+            System.out.println("Accommodation " + (counter+1) + ": " + s.everyAccommodation.get(temp).getAcName());
             counter++;
         }
     }
 
     /**
      * Prints accommodations for the provider.
+     * @param s
      */
     
-    public void printForAcProvider () {
-        this.printAllAccommodations();
+    public void printForAcProvider (Storage s) {
+        this.printAllAccommodations(s);
     }
 
     /**
      * Prints all accommodations.
+     * @param s
      */
     
-    private void printAllAccommodations () {
+    private void printAllAccommodations (Storage s) {
         int counter =0;
         if (myAc.isEmpty()) {
             System.out.println("No accommodations found.");
             return;
         }
-        for (Accommodation temp : myAc) {
-            System.out.println("Accommodation " + (counter+1) + ": " + temp.getAcName());
+        for (String temp : myAc) {
+            System.out.println("Accommodation " + (counter+1) + ": " + s.everyAccommodation.get(temp).getAcName());
             counter++;
         }
     }
 
     /**
      * Prints all reservations of the providers accommodations.
+     * @param s
      */
     
-    public void printAllReservations () {
+    public void printAllReservations (Storage s) {
         System.out.println();
         if (myB.isEmpty()) {
             System.out.println("No reservations found.");
             return;
         }
-        for (SubBooking a : myB) {
-            a.printInfo();
+        for (String a : myB) {
+            s.everyBooking.get(a).printInfo(s);
         }
+    }
+    
+    public ArrayList <Accommodation> AcSearch (Storage s, ArrayList <String> criteria) {
+        ArrayList <Accommodation> total = new ArrayList <> ();
+        for (String temp : myAc) {
+            total.add(s.everyAccommodation.get(temp));
+        }
+        return total;
     }
 
 }

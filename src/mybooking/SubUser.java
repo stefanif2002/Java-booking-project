@@ -16,12 +16,12 @@ protected String phoneNumber;
 protected boolean access;
 protected boolean checked;
 
-    public SubUser (String name, String email, String username, String password, int personalPin, String address, String phoneNumber) {
+    public SubUser (String name, String email, String username, String password, int personalPin, String address, String phoneNumber, boolean access, boolean checked) {
         super(name, email, username, password, personalPin);
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.checked = false;
-        this.access = false;
+        this.checked = checked;
+        this.access = access;
     }
     
     /**
@@ -40,6 +40,14 @@ protected boolean checked;
     public void setPhoneNumber (String phone) {
         phoneNumber = phone;
     }
+    
+    public boolean getAccess () {
+        return access;
+    }
+    
+    public boolean getChecked () {
+        return checked;
+    }
 
     /**
      * @return Customers phone number.
@@ -57,6 +65,10 @@ protected boolean checked;
     public void application (boolean temp) {
         checked = true;
         access = temp;
+    }
+    
+    public boolean statusReport1 () {
+        return !access;
     }
 
     /**

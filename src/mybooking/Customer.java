@@ -1,7 +1,6 @@
 package mybooking;
 
-import static java.lang.constant.ConstantDescs.NULL;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -15,7 +14,7 @@ private String lastName;
 private String dateOfBirth;
 private int id;
 private double balance;
-private LinkedList <Booking> myBookings;
+private ArrayList <String> myBookings;
 
     /**
      * Constructor that initializes the customers information.
@@ -30,11 +29,23 @@ private LinkedList <Booking> myBookings;
      * @param i The id of the customer.
      * @param pay The bank account balance of the customer.
      * @param personalPin The personal confirmation pin of the customer.
+     * @param access
+     * @param checked
+     * @param myBookings
      */
 
-    public Customer (String name, String lastName, String address, String email, String username, String password, String phoneNumber, String d, int i, double pay, int personalPin) {
-        super(name, email, username, password, personalPin, address, phoneNumber);
-        this.myBookings = new LinkedList <> ();
+    public Customer (String name, String lastName, String address, String email, String username, String password, String phoneNumber, String d, int i, double pay, int personalPin, boolean access, boolean checked, ArrayList <String> myBookings) {
+        super(name, email, username, password, personalPin, address, phoneNumber, access, checked);
+        this.myBookings = myBookings;
+        this.lastName = lastName;
+        dateOfBirth = d;
+        id = i;
+        balance = pay;
+    }
+    
+    public Customer (String name, String lastName, String address, String email, String username, String password, String phoneNumber, String d, int i, double pay, int personalPin, boolean access, boolean checked) {
+        super(name, email, username, password, personalPin, address, phoneNumber, access, checked);
+        this.myBookings = new ArrayList <> ();
         this.lastName = lastName;
         dateOfBirth = d;
         id = i;
@@ -66,6 +77,10 @@ private LinkedList <Booking> myBookings;
     public void setDateOfBirth (String date) {
         dateOfBirth = date;
     }
+    
+    public String getDateOfBirth () {
+        return dateOfBirth;
+    }
 
     /**
      * Refactors customers id.
@@ -74,6 +89,14 @@ private LinkedList <Booking> myBookings;
 
     public void setId (int i) {
         id = i;
+    }
+    
+    public int getId () {
+        return id;
+    }
+    
+    public ArrayList <String> getMyBookings() {
+        return myBookings;
     }
 
     /**
@@ -102,17 +125,18 @@ private LinkedList <Booking> myBookings;
      * @param beg The date of the arrival.
      * @param end The date of the departure.
      * @param time The time of the arrival.
+     * @param s
      * @return True if the booking was successfully placed.
      */
 
-    public boolean placeBooking (Accommodation name, int beg, int end, int time) {
+    public boolean placeBooking (Accommodation name, int beg, int end, int time, Storage s) {
         if (name.reservation(beg, end)) {
-            Booking e = new Booking(name, beg, end, time,this.name);
+            Booking e = new Booking(name.getAcName(), beg, end, time,this.name, s);
             if (this.paymentConfirmation()) {
                 if (this.payment(e.getPrice())) {
                     e.setPaymentStatus();
-                    e.askForReserve();
-                    myBookings.add(e);
+                    e.askForReserve(s);
+                    addBooking (e,s);
                     return true;
                 }
             }
@@ -121,6 +145,11 @@ private LinkedList <Booking> myBookings;
             }
         }
         return false;
+    }
+    
+    private void addBooking (Booking e, Storage s) {
+        s.everyBooking.put(e.bookingName, e);
+        myBookings.add(e.bookingName);
     }
 
     /**
@@ -162,27 +191,30 @@ private LinkedList <Booking> myBookings;
     /**
      * Cancels the booking with the given name.
      * @param name
+     * @param s
      */
-    public void cancelBooking (Booking name) {
+    public void cancelBooking (Booking name, Storage s) {
         if (this.paymentConfirmation()) {
-            name.askForCancellation();
+            name.askForCancellation(s);
             this.refund(name);
-            myBookings.remove(name);
+            deleteBooking(name, s);
         }
+    }
+    
+    private void deleteBooking (Booking name, Storage s) {
+        myBookings.remove(name.bookingName);
+        s.everyBooking.remove(name.bookingName);
     }
 
     /**
      * Determines whether a booking exists or not.
      * @param name Booking name.
+     * @param s
      * @return True if the booking exists.
      */
 
-    public boolean bookingExist (String name) {
-        for (Booking a : myBookings) {
-            if (a.bookingName.equals(name))
-                return true;
-        }
-        return false;
+    public boolean bookingExist (String name, Storage s) {
+        return s.everyBooking.containsKey(name) && myBookings.contains(name);
     }
 
     /**
@@ -196,35 +228,43 @@ private LinkedList <Booking> myBookings;
 
     /**
      * Prints customers bookings.
+     * @param s
      */
 
-    public void printMyBookings () {
-        for (Booking a : myBookings)
-            a.printInfo();
+    public boolean printMyBookings (Storage s) {
+        if (myBookings.isEmpty())
+            return true;
+        for (String a : myBookings) {
+            if (s.everyBooking.containsKey(a))
+               s.everyBooking.get(a).printInfo(s);
+            else {
+                System.out.println("Error: Your booking accidently has been deleted. Please contact us so that we can refund your money.");
+                myBookings.remove(a);
+                return false;
+                
+            }
+        }
+        return true;
     }
 
     /**
-     * Searches and returns the booking with the given name.
-     * This method should only be used after the "bookingExist (String name)" method,
+     * Searches and returns the booking with the given name.This method should only be used after the "bookingExist (String name)" method,
      * so that it's ensured that the booking exists.
      * @param n Name of the booking.
+     * @param s
      * @return The booking.
      */
     
-    public Booking returnBooking (String n) {
-       for (Booking a : myBookings) {
-           if (a.bookingName.equals(n))
-               return a;
-       }
-       System.out.println("Booking not found");
-       return (Booking) NULL;
+    public Booking returnBooking (String n, Storage s) {
+        return s.everyBooking.get(n);
     }
 
     /**
      * Prints customers information.
+     * @param s
      */
 
-    public void printCustomerInfo () {
+    public void printCustomerInfo (Storage s) {
         System.out.println("Customer info: ");
         super.printUsersInfo();
         System.out.println("Last name: " + lastName);
@@ -234,7 +274,16 @@ private LinkedList <Booking> myBookings;
         if (myBookings.isEmpty())
             return;
         System.out.println("\nCustomers bookings: ");
-        this.printMyBookings();
+        this.printMyBookings(s);
+    }
+    
+    public void printCustomerForManager (Storage s) {
+        System.out.println("Customer info: ");
+        super.printUsersInfo();
+        System.out.println("Last name: " + lastName);
+        System.out.println("Date of birth: " + dateOfBirth);
+        System.out.println("Id: " + id);
+        System.out.println("Balance: " + balance);
     }
 
 }

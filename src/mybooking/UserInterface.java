@@ -112,7 +112,7 @@ private final Scanner myScan;
         balance = myScan.nextDouble();
         System.out.print("Please insert your personal payment confirmation pin: ");
         pin = myScan.nextInt();
-        Customer newC = new Customer (name, lastName, address, email, username, password, phoneNumber, dateOfBirth, id, balance, pin);
+        Customer newC = new Customer (name, lastName, address, email, username, password, phoneNumber, dateOfBirth, id, balance, pin, false, false);
         a.addCustomer(newC);
         return newC;
     }
@@ -154,7 +154,7 @@ private final Scanner myScan;
         }
         System.out.print("Please insert your personal confirmation pin: ");
         pin = myScan.nextInt();
-        AcProvider newAc = new AcProvider (name, base, email, username, password, phoneNumber, pin);
+        AcProvider newAc = new AcProvider (name, base, email, username, password, phoneNumber, pin, false, false);
         a.addProvider(newAc);
         return newAc;
     }
@@ -201,17 +201,16 @@ private final Scanner myScan;
                     time = myScan.nextInt();
                     myScan.nextLine();
                     if (a.AcSearch(name)) {
-                            if (p.placeBooking(a.AcReturn(name), (beg-1), (end-1), time)) {
+                        if (p.placeBooking(a.AcReturn(name), (beg-1), (end-1), time, this.a)) 
                             System.out.println("Booking successfully placed.");
-                            a.addSubBooking(name + " - " + p.getName(), p.getName(), a.AcReturn(name), (beg-1), (end-1), time );
-                            }
                     }
                     else
                         System.out.println("Accommodation not found.");
                     }
 
                 case "bookings" -> {
-                    p.printMyBookings();
+                    while (!p.printMyBookings(a))
+                        System.out.println();
                     System.out.println("Press enter to continue...");
                     myScan.nextLine();
                 }
@@ -234,9 +233,8 @@ private final Scanner myScan;
                     String name;
                     System.out.print("Which booking you want to cancel: ");
                     name = myScan.nextLine();
-                    if (p.bookingExist(name)) {
-                        p.cancelBooking(p.returnBooking(name));
-                        a.cancelBooking(name);
+                    if (p.bookingExist(name, a)) {
+                        p.cancelBooking(p.returnBooking(name, a) , a);
                         System.out.println("Booking successfully canceled.");
                     }
                     else
@@ -277,11 +275,11 @@ private final Scanner myScan;
             type = myScan.nextLine();
             System.out.println();
             switch (type) {
-                case "add" -> p.accomCreate();
-                case "delete" -> p.accomDelete();
+                case "add" -> p.accomCreate(a);
+                case "delete" -> p.accomDelete(a);
                 case "search" -> this.searchAc(p);
                 case "info" -> this.infoAc(p);
-                case "reservations" -> p.printAllReservations();
+                case "reservations" -> p.printAllReservations(a);
                 case "log" -> System.out.print("");
                 default -> System.out.println("Wrong input. Please try again.");
             }
@@ -320,7 +318,7 @@ private final Scanner myScan;
                             if (a.printAllUsers("customer")) {
                                 System.out.print("Which customer would you like to see info for: ");
                                 type = myScan.nextLine();
-                                a.manager.findCustomer(a.getCostumers(), type);
+                                a.manager.findCustomer(a.getCostumers(), type, a);
                                 System.out.println("Press enter to continue...");
                                 myScan.nextLine();
                             }
@@ -329,7 +327,7 @@ private final Scanner myScan;
                             if (a.printAllUsers("provider")) {
                                 System.out.print("Which accommodation provider would you like to see info for: ");
                                 type = myScan.nextLine();
-                                a.manager.findAcProvider(a.getAcProviders(), type);
+                                a.manager.findAcProvider(a.getAcProviders(), type, a);
                                 System.out.println("Press enter to continue...");
                                 myScan.nextLine();
                             }
@@ -341,12 +339,12 @@ private final Scanner myScan;
                     if (a.printAllBookings()) {
                         System.out.print("Which booking would you like to see info for: ");
                         type = myScan.nextLine();
-                        a.manager.findBooking(a.getBookings(), type);
+                        a.manager.findBooking(a, type);
                         System.out.println("Press enter to continue...");
                         myScan.nextLine();
                     }
                 }
-                case "applications" -> a.manager.waitingList();
+                case "applications" -> a.manager.waitingList(a);
                 case "message" -> System.out.println(); //Will be created during the second part of the assignment
                 case "log" -> System.out.print("");
                 default -> System.out.println("Wrong input. Please try again.");
@@ -444,12 +442,12 @@ private final Scanner myScan;
     private void searchAc (AcProvider temp) {
         Accommodation t;
         String b;
-        temp.printForAcProvider();
+        temp.printForAcProvider(a);
         System.out.println();
         System.out.print("Please insert the name of the accommodation: ");
         b = myScan.nextLine();
-        if (temp.accomExist(b)) {
-            t = temp.accomFind(b);
+        if (temp.accomExist(b,a)) {
+            t = temp.accomFind(b,a);
             t.printFullDescription();
             System.out.print("Do you wish to add more services to the accommodation (yes or no): ");
             b = myScan.nextLine();

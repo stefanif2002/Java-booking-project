@@ -86,6 +86,14 @@ protected final int personalPin;
     private void setPassword (String pass) {
         password = pass;
     }
+    
+    public String getPassword () {
+        return password;
+    }
+    
+    public int getPin () {
+        return personalPin;
+    }
 
     /**
      * Refactors customers username or password.

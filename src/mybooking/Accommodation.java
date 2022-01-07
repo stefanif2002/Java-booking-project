@@ -14,7 +14,7 @@ private final double price;
 private final int squareMeters;
 private ArrayList <String> servicesList = new ArrayList <> ();
 private boolean[] availability;
-private final AcProvider owner;
+private final String owner;
 
     /**
      * Constructor that initializes the accommodation information.
@@ -24,7 +24,7 @@ private final AcProvider owner;
      * @param o The provider of the accommodation.
      */
     
-     public Accommodation (String a, double b, int c, AcProvider o) {
+     public Accommodation (String a, double b, int c, String o) {
         availability = new boolean[30];
         name = a;
         price = b;
@@ -39,11 +39,12 @@ private final AcProvider owner;
      * @param b The price of the accommodation.
      * @param c The square meters of the accommodation.
      * @param list The list of services of the accommodation.
+     * @param av
      * @param o The provider of the accommodation.
      */
     
-    public Accommodation (String a, double b, int c, ArrayList <String> list, AcProvider o) {
-        availability = new boolean[30];
+    public Accommodation (String a, String o, double b, int c, boolean[] av, ArrayList <String> list) {
+        availability = av;
         name = a;
         price = b;
         squareMeters = c;
@@ -59,13 +60,34 @@ private final AcProvider owner;
     public String getAcName () {
         return name;
     }
+    
+    public String getOwnersName () {
+        return owner;
+    }
+    
+    public double getPrice () {
+        return price;
+    }
+    
+    public int getSquareMeters () {
+        return squareMeters;
+    }
+    
+    public boolean[] getAvailability () {
+        return availability;
+    }
 
     /**
+     * @param s
      * @return The provider of the accommodation.
      */
 
-    public AcProvider getAcProvider () {
-        return owner;
+    public AcProvider getAcProvider (Storage s) {
+        for (AcProvider temp : s.AcProviders) {
+            if (temp.name.equals(owner))
+                return temp;
+        }
+        return (AcProvider) null;
     }
 
     /**
@@ -191,7 +213,7 @@ private final AcProvider owner;
 
     public void printFullDescription () {
         System.out.println("Accommodation's name: " + name);
-        System.out.println("Accommodation's owner: " + owner.getName());
+        System.out.println("Accommodation's owner: " + owner);
         System.out.println("Accommodation's price: " + price);
         System.out.println("Accommodation's squareMeters: " + squareMeters);
         System.out.println("Accommodation's servicesList: ");

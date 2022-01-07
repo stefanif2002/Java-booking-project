@@ -1,8 +1,7 @@
 package mybooking;
 
-import static java.lang.constant.ConstantDescs.NULL;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -15,10 +14,11 @@ import java.util.Scanner;
 
 public class Storage {
 
-private ArrayList <Customer> customers;
-private ArrayList <AcProvider> AcProviders;
+public ArrayList <Customer> customers;
+public ArrayList <AcProvider> AcProviders;
 public Manager manager;
-private ArrayList <SubBooking> everyBooking;
+public HashMap <String, Booking> everyBooking;
+public HashMap <String, Accommodation> everyAccommodation;
 
     /**
      * Constructor that initializes the ArrayLists customers, AcProviders, everyBooking and the variable manager.
@@ -33,7 +33,8 @@ private ArrayList <SubBooking> everyBooking;
     public Storage (String name, String lastName, String email, String user, String pass, int pin) {
         customers = new ArrayList <> ();
         AcProviders = new ArrayList<>();
-        everyBooking = new ArrayList<>();
+        everyBooking = new HashMap<>();
+        everyAccommodation = new HashMap<>();
         manager = new Manager(name, lastName, email, user, pass, pin);
     }
 
@@ -44,10 +45,11 @@ private ArrayList <SubBooking> everyBooking;
      * @param m The manager.
      */
 
-    public Storage (ArrayList <Customer> c, ArrayList <AcProvider> a,Manager m) {
+    public Storage (ArrayList <Customer> c, ArrayList <AcProvider> a, Manager m) {
         customers = c;
         AcProviders = a;
-        everyBooking = new ArrayList<>();
+        everyBooking = new HashMap<>();
+        everyAccommodation = new HashMap<>();
         manager = m;
     }
     
@@ -97,7 +99,7 @@ private ArrayList <SubBooking> everyBooking;
      * @return List of Bookings.
      */
     
-    public  ArrayList <SubBooking> getBookings () {
+    public  HashMap <String, Booking> getBookings () {
         return everyBooking;
     }
 
@@ -150,7 +152,7 @@ private ArrayList <SubBooking> everyBooking;
             Scanner myScan = new Scanner(System.in);
             String b;
             for (AcProvider a : AcProviders) {
-                a.printForCustomer();
+                a.printForCustomer(this);
             }
             System.out.println("Which accommodation would you like to see info for: ");
             b = myScan.nextLine();
@@ -173,11 +175,7 @@ private ArrayList <SubBooking> everyBooking;
      */
 
     public boolean AcSearch (String name) {
-        for (AcProvider temp : AcProviders) {
-            if (temp.accomExist(name))
-                return true;
-        }
-        return false;
+        return this.everyAccommodation.containsKey(name);
     }
 
     /**
@@ -187,11 +185,9 @@ private ArrayList <SubBooking> everyBooking;
 
     public void AcSearch (ArrayList <String> criteria) {
         if (this.checkAccom()) {
-            LinkedList <Accommodation> total = new LinkedList <> ();
+            ArrayList <Accommodation> total = new ArrayList <> ();
             for (AcProvider tempAcPr : AcProviders) {
-                tempAcPr.myAc.stream().filter(tempAc -> (tempAc.containsAcListOfServices(criteria))).forEachOrdered(tempAc -> {
-                    total.add(tempAc);
-                });
+                total.addAll(tempAcPr.AcSearch(this, criteria));
             }
             if (total.isEmpty()) {
                 System.out.println("No accommodations found with the specific criteria.");
@@ -213,11 +209,7 @@ private ArrayList <SubBooking> everyBooking;
      */
 
     public Accommodation AcReturn (String name) {
-        for (AcProvider temp : AcProviders) {
-            if (temp.accomExist(name))
-                return temp.accomFind(name);
-         }
-        return (Accommodation) NULL;
+        return this.everyAccommodation.get(name);
     }
 
     /**
@@ -226,7 +218,7 @@ private ArrayList <SubBooking> everyBooking;
      * @param temp The list of accommodations.
      */
     
-    private void printAcSearch (LinkedList <Accommodation> temp) {
+    private void printAcSearch (ArrayList <Accommodation> temp) {
         Scanner myScan = new Scanner(System.in);
         String b;
         for (Accommodation accommodation : temp) {
@@ -237,35 +229,6 @@ private ArrayList <SubBooking> everyBooking;
         for (Accommodation a: temp ) {
             if (a.getAcName().equals(b))
                 a.printFullDescription();
-        }
-    }
-
-    /**
-     * Adds a booking to the everyBooking list.
-     * @param bN The bookings name.
-     * @param cN The customers name.
-     * @param aN The accommodations name.
-     * @param b The date of the arrival.
-     * @param e The date of the departure.
-     * @param tA The time of Arrival.
-     */
-
-    public void addSubBooking (String bN, String cN, Accommodation aN, int b, int e, int tA) {
-        SubBooking temp = new SubBooking (bN, cN, aN, b, e, tA);
-        everyBooking.add(temp);
-    }
-
-    /**
-     * Removes the booking with the given name.
-     * @param name The name of the booking.
-     */
-
-    public void cancelBooking (String name) {
-        for (SubBooking a : everyBooking) {
-            if (a.bookingName.equals(name)) {
-                everyBooking.remove(a);
-                return;
-            }
         }
     }
 
@@ -281,10 +244,10 @@ private ArrayList <SubBooking> everyBooking;
             System.out.println("There are no bookings placed yet.");
             return false;
         }
-        for (SubBooking temp : everyBooking) {
+        for (String temp : everyBooking.keySet()) {
             i++;
             System.out.print(i + ". ");
-            System.out.println(temp.bookingName);
+            System.out.println(everyBooking.get(temp).bookingName);
         }
         return true;
     }

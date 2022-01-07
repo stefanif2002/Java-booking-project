@@ -5,8 +5,14 @@ package mybooking;
  * @author Stefanos Ifoulis (AEM: 3998)
  */
 
-public class Booking extends SubBooking {
-
+public class Booking {
+    
+public final String bookingName;
+public final String costumerName;
+public final String accommodation;
+public final int beginning;
+public final int ending;
+public final int timeOfArrival;
 private boolean paymentStatus = false;
 private boolean reservationStatus = false;
 private double price;
@@ -18,11 +24,27 @@ private double price;
      * @param ending The date of the departure.
      * @param timeOfArrival The time of the arrival.
      * @param costumerName The name of the customer.
+     * @param s
      */
     
-    public Booking (Accommodation accommodation, int beginning, int ending, int timeOfArrival, String costumerName) {
-        super(accommodation.getAcName() + costumerName, costumerName, accommodation, beginning, ending, timeOfArrival);
-        this.setPrice(beginning, ending);
+    public Booking (String accommodation, int beginning, int ending, int timeOfArrival, String costumerName, Storage s) {
+        this.bookingName = accommodation + " - " + costumerName;
+        this.costumerName = costumerName;
+        this.accommodation = accommodation;
+        this.beginning = beginning;
+        this.ending = ending;
+        this.timeOfArrival = timeOfArrival;
+        this.setPrice(beginning, ending, s);
+    }
+    
+    public Booking (String bookingName , String costumerName, String accommodation, int beginning, int ending, int timeOfArrival, double price, boolean paymentStatus, boolean reservationStatus, Storage s) {
+        this.bookingName = bookingName;
+        this.costumerName = costumerName;
+        this.accommodation = accommodation;
+        this.beginning = beginning;
+        this.ending = ending;
+        this.timeOfArrival = timeOfArrival;
+        this.setPrice(beginning, ending, s);
     }
 
     /**
@@ -47,8 +69,8 @@ private double price;
      * @param end The date of the departure.
      */
     
-    private void setPrice (int beg, int end) {
-        price = accommodation.getAcFinalPrice(end-beg);
+    private void setPrice (int beg, int end, Storage s) {
+        price = getAccommodation(s).getAcFinalPrice(end-beg);
     }
 
     /**
@@ -58,23 +80,48 @@ private double price;
     public double getPrice () {
         return price;
     }
+    
+    public boolean getPaymentStatus () {
+        return paymentStatus;
+    }
+    
+    public boolean getReservationStatus () {
+        return reservationStatus;
+    }
 
     /**
      * Asks for reservation confirmation from the provider.
+     * @param s
      */
 
-    public void askForReserve () {
-       accommodation.getAcProvider().reservationConf(accommodation, costumerName, beginning, ending, timeOfArrival);
+    public void askForReserve (Storage s) {
+       getAccommodation(s).getAcProvider(s).reservationConf(getAccommodation(s), this, beginning, ending, timeOfArrival);
        this.setReservationStatus(true);
     }
 
     /**
      * Asks for cancellation confirmation from the provider.
+     * @param s
      */
     
-    public void askForCancellation () {
-       accommodation.getAcProvider().reservationCancel(bookingName, accommodation, beginning, ending);
+    public void askForCancellation (Storage s) {
+       getAccommodation(s).getAcProvider(s).reservationCancel(bookingName, getAccommodation(s), beginning, ending);
        this.setReservationStatus(false);
+    }
+    
+    public void printInfo (Storage s) {
+        System.out.println("Booking name: " + bookingName);
+        System.out.println("Costumer name: " + costumerName);
+        System.out.println("Accommodation name: " + accommodation);
+        System.out.println("Beginning day: " + (beginning+1));
+        System.out.println("Ending day: " + (ending+1));
+        System.out.println("Time of arrival: " + timeOfArrival);
+        System.out.println("Price: " + price);
+        System.out.println();
+    }
+    
+    private Accommodation getAccommodation (Storage s) {
+        return s.everyAccommodation.get(accommodation);
     }
 
 }

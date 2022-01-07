@@ -5,6 +5,8 @@
  */
 package mybooking;
 
+import java.io.IOException;
+
 /**
  * The JavaProject class contains the main method, the user interface and
  * a Storage type object, named a, which links it with the program. <br>
@@ -21,12 +23,14 @@ public class JavaProject {
      *      3. Exit. <br>
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Storage a = new Storage ("Name", "Last Name", "Email@gmail.com", "username", "password", 2021);
         UserInterface project = new UserInterface (a);
+        Files myFiles = new Files (a);
+        myFiles.readFromAllFiles ();
         project.mainMenuInterface();
-        
-        }
+        myFiles.writeToAllFiles();
+    }
         
     
     
