@@ -143,23 +143,12 @@ protected final int personalPin;
     
     /**
      * Verifies the user through his personal pin.
+     * @param pin
      * @return True if the user is verified and false otherwise.
      */
 
-    public boolean personalPinConfirmation () {
-        Scanner myScan = new Scanner(System.in);
-        for (int i=3; i>0; i--) {
-            System.out.print("Insert your confirmation pin: ");
-            int pin = myScan.nextInt();
-            if (pin==personalPin) {
-                return true;
-            }
-            else {
-                System.out.println("Wrong confirmation pin. Please try again");
-                System.out.println("You have "+ (i-1) +" more tries.");
-            }
-        }
-        return false;
+    public boolean personalPinConfirmation (int pin) {
+        return pin == personalPin;
     }
     
 }

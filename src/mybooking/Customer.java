@@ -105,9 +105,7 @@ private ArrayList <String> myBookings;
      */
 
     public void changeBalance(double n) {
-        if (this.paymentConfirmation()) {
             balance += n;
-        }
     }
 
     /**
@@ -125,6 +123,7 @@ private ArrayList <String> myBookings;
      * @param beg The date of the arrival.
      * @param end The date of the departure.
      * @param time The time of the arrival.
+     * @param pin
      * @param s
      * @return True if the booking was successfully placed.
      */
@@ -132,16 +131,11 @@ private ArrayList <String> myBookings;
     public boolean placeBooking (Accommodation name, int beg, int end, int time, Storage s) {
         if (name.reservation(beg, end)) {
             Booking e = new Booking(name.getAcName(), beg, end, time,this.name, s);
-            if (this.paymentConfirmation()) {
-                if (this.payment(e.getPrice())) {
-                    e.setPaymentStatus();
-                    e.askForReserve(s);
-                    addBooking (e,s);
-                    return true;
-                }
-            }
-            else {
-                System.out.println("Presidure is canceled due too wrong payment confirmation.");
+            if (this.payment(e.getPrice())) {
+                e.setPaymentStatus();
+                e.askForReserve(s);
+                addBooking (e,s);
+                return true;
             }
         }
         return false;
@@ -156,22 +150,6 @@ private ArrayList <String> myBookings;
      * Verifies the user through his personal pin.
      * @return True if the user is verified and false otherwise.
      */
-    
-    private boolean paymentConfirmation () {
-        Scanner myScan = new Scanner(System.in);
-        for (int i=3; i>0; i--) {
-            System.out.print("Insert your confirmation pin: ");
-            int pin = myScan.nextInt();
-            if (pin==personalPin) {
-                return true;
-            }
-            else {
-                System.out.println("Wrong confirmation pin. Please try again.");
-                System.out.println("You have "+ i +" more tries.");
-            }
-        }
-        return false;
-    }
 
     /**
      * Carries out the payment.
@@ -191,14 +169,13 @@ private ArrayList <String> myBookings;
     /**
      * Cancels the booking with the given name.
      * @param name
+     * @param pin
      * @param s
      */
     public void cancelBooking (Booking name, Storage s) {
-        if (this.paymentConfirmation()) {
             name.askForCancellation(s);
             this.refund(name);
             deleteBooking(name, s);
-        }
     }
     
     private void deleteBooking (Booking name, Storage s) {
@@ -229,22 +206,19 @@ private ArrayList <String> myBookings;
     /**
      * Prints customers bookings.
      * @param s
+     * @return 
      */
 
-    public boolean printMyBookings (Storage s) {
+    public ArrayList <Booking> returnMyBookings (Storage s) {
+        ArrayList <Booking> tt = new ArrayList <> ();
         if (myBookings.isEmpty())
-            return true;
+            return null;
         for (String a : myBookings) {
-            if (s.everyBooking.containsKey(a))
-               s.everyBooking.get(a).printInfo(s);
-            else {
-                System.out.println("Error: Your booking accidently has been deleted. Please contact us so that we can refund your money.");
-                myBookings.remove(a);
-                return false;
-                
-            }
+               tt.add(s.everyBooking.get(a));
         }
-        return true;
+        if (tt.isEmpty())
+            return null;
+        return tt;
     }
 
     /**
@@ -257,33 +231,6 @@ private ArrayList <String> myBookings;
     
     public Booking returnBooking (String n, Storage s) {
         return s.everyBooking.get(n);
-    }
-
-    /**
-     * Prints customers information.
-     * @param s
-     */
-
-    public void printCustomerInfo (Storage s) {
-        System.out.println("Customer info: ");
-        super.printUsersInfo();
-        System.out.println("Last name: " + lastName);
-        System.out.println("Date of birth: " + dateOfBirth);
-        System.out.println("Id: " + id);
-        System.out.println("Balance: " + balance);
-        if (myBookings.isEmpty())
-            return;
-        System.out.println("\nCustomers bookings: ");
-        this.printMyBookings(s);
-    }
-    
-    public void printCustomerForManager (Storage s) {
-        System.out.println("Customer info: ");
-        super.printUsersInfo();
-        System.out.println("Last name: " + lastName);
-        System.out.println("Date of birth: " + dateOfBirth);
-        System.out.println("Id: " + id);
-        System.out.println("Balance: " + balance);
     }
 
 }

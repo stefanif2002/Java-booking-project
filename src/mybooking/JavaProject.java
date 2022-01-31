@@ -22,14 +22,14 @@ public class JavaProject {
      *      2. Sing-up (types of users that can sign-up: Customer or Accommodation provider). <br>
      *      3. Exit. <br>
      * @param args the command line arguments
+     * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        Storage a = new Storage ("Name", "Last Name", "Email@gmail.com", "username", "password", 2021);
-        UserInterface project = new UserInterface (a);
+        Storage a = new Storage ("Name", "Last Name", "Email@gmail.com", "username", "password", 2022);
         Files myFiles = new Files (a);
         myFiles.readFromAllFiles ();
-        project.mainMenuInterface();
-        myFiles.writeToAllFiles();
+        GUI myGui = new GUI (a, myFiles);
+        myGui.makeVisible();
     }
         
     

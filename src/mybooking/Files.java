@@ -8,7 +8,6 @@ package mybooking;
 import java.io.*;
 import static java.lang.constant.ConstantDescs.NULL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -168,9 +167,9 @@ private final Storage myStorage;
         beginning = readInteger(reader);
         ending = readInteger(reader);
         timeOfArrival = readInteger(reader);
+        price = readDouble(reader);
         paymentStatus = readBoolean(reader);
         reservationStatus = readBoolean(reader);
-        price = readDouble(reader);
             
         return new Booking (list.get(0), list.get(1), list.get(2), beginning, ending, timeOfArrival, price, paymentStatus, reservationStatus,  myStorage);
         
@@ -192,8 +191,8 @@ private final Storage myStorage;
     
     private Accommodation readAccommodation (BufferedReader reader) throws IOException {
         ArrayList <String> list = new ArrayList <> ();
-        ArrayList <String> servicesList = new ArrayList <> ();
-        int squareMeters, count;
+        boolean servicesList[] = new boolean[5];
+        int squareMeters, beds;
         boolean[] availability;
         availability = new boolean[30];
         double price;
@@ -202,35 +201,39 @@ private final Storage myStorage;
             list.add(i, readString(reader));
         }
         
-        squareMeters = readInteger(reader);
+        beds = readInteger(reader);
         price = readDouble(reader);
+        squareMeters = readInteger(reader);
         
         nextline = reader.readLine();
         for (int i =0; i<30; i++) {
             availability[i] = readBoolean(reader);
         }
 
-        count = readInteger(reader);
+        nextline = reader.readLine();
             
-        for (int i =0; i<count; i++) {
-            nextline = reader.readLine();
-            servicesList.add(i, nextline);
+        for (int i =0; i<5; i++) {
+            servicesList[i] = readBoolean(reader);
         }
-            
-        return new Accommodation (list.get(0), list.get(1), price, squareMeters, availability, servicesList);
+        
+        return new Accommodation (list.get(0), list.get(1), beds, price, squareMeters, availability, servicesList);
         
     }
     
-    private void writeAccommodation (BufferedWriter writer, int no, String name, String owner, double price, int squareMeters, boolean[] availability, ArrayList <String> servicesList) throws IOException {
-        writeString (writer, "Accommodation Provider" + no);
+    private void writeAccommodation (BufferedWriter writer, int no, String name, String owner, int beds, double price, int squareMeters, boolean[] availability, boolean[] servicesList) throws IOException {
+        writeString (writer, "Accommodation" + no);
         writeString (writer, "Name :" + name);
         writeString (writer, "Owners Name  :" + owner);
+        writeString (writer, "Beds  :" + beds);
         writeString (writer, "Price :" + price);
         writeString (writer, "Square Meters :" + squareMeters);
-        writeString (writer, "Reservation Status :" + Arrays.toString(availability));
-        writeString (writer, "My Services List :" + servicesList.size());
-        for (int i = 0; i<servicesList.size(); i++) {
-            writeString (writer, servicesList.get(i));
+        writeString (writer, "Reservation Status :");
+        for (int i = 0; i<30; i++) {
+            writeString (writer, i + ":" + availability[i]);
+        }
+        writeString (writer, "My Services List :");
+        for (int i = 0; i<5; i++) {
+            writeString (writer, i + ":" + servicesList[i]);
         }
         writer.newLine();
     }
@@ -379,7 +382,7 @@ private final Storage myStorage;
         try (BufferedWriter writer = this.openBufferedWriter("Accommodations")) {
             int i = 0;
             for (Accommodation temp: myStorage.everyAccommodation.values()) {
-                writeAccommodation(writer, i+1, temp.getAcName(), temp.getOwnersName(), temp.getPrice(), temp.getSquareMeters(), temp.getAvailability(), temp.getAcServicesList());
+                writeAccommodation(writer, i+1, temp.getAcName(), temp.getOwnersName(), temp.getBeds(), temp.getPrice(), temp.getSquareMeters(), temp.getAvailability(), temp.getAcServicesList());
                 i++;
             }
         }

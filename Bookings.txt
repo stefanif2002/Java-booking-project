@@ -1,0 +1,11 @@
+Accommodation Provider1
+Name :Home1 - Steve
+Costumer Name  :Steve
+Accommodation :Home1
+Beginning :1
+Ending :2
+Time Of Arrival :3
+Price :37.5
+Payment Status :true
+Reservation Status :true
+

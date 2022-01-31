@@ -1,7 +1,5 @@
 package mybooking;
 
-import java.util.ArrayList;
-
 /**
  * The Accommodation class contains the information of a accommodation.
  * @author Stefanos Ifoulis (AEM: 3998)
@@ -9,10 +7,11 @@ import java.util.ArrayList;
 
 public class Accommodation {
 
-private final String name;
-private final double price;
-private final int squareMeters;
-private ArrayList <String> servicesList = new ArrayList <> ();
+private String name;
+private double price;
+private int squareMeters;
+private int beds;
+private boolean[] services;
 private boolean[] availability;
 private final String owner;
 
@@ -21,11 +20,15 @@ private final String owner;
      * @param a The name of the accommodation.
      * @param b The price of the accommodation.
      * @param c The square meters of the accommodation.
+     * @param bed
      * @param o The provider of the accommodation.
+     * @param list
      */
     
-     public Accommodation (String a, double b, int c, String o) {
+     public Accommodation (String a, double b, int c, int bed, String o, boolean[] list) {
         availability = new boolean[30];
+        beds = bed;
+        services = list;
         name = a;
         price = b;
         squareMeters = c;
@@ -37,18 +40,20 @@ private final String owner;
      * Constructor that initializes the accommodation information.
      * @param a The name of the accommodation.
      * @param b The price of the accommodation.
+     * @param bed
      * @param c The square meters of the accommodation.
      * @param list The list of services of the accommodation.
      * @param av
      * @param o The provider of the accommodation.
      */
     
-    public Accommodation (String a, String o, double b, int c, boolean[] av, ArrayList <String> list) {
+    public Accommodation (String a, String o, int bed, double b, int c, boolean[] av, boolean[] list) {
         availability = av;
         name = a;
         price = b;
+        beds = bed;
         squareMeters = c;
-        servicesList = list;
+        services = list;
         owner = o;
         this.setAvailability();
     }
@@ -61,41 +66,52 @@ private final String owner;
         return name;
     }
     
+    public void setAcName (String a) {
+        name = a;
+    }
+    
     public String getOwnersName () {
         return owner;
+    }
+    
+    public AcProvider getAcProvider (Storage s) {
+        return s.getAcProvider(owner);
     }
     
     public double getPrice () {
         return price;
     }
     
+    public void setPrice (double b) {
+        price = b;
+    }
+    
     public int getSquareMeters () {
         return squareMeters;
     }
     
+    public void setSquareMeters (int c) {
+        squareMeters = c;
+    }
+    
+     public int getBeds () {
+        return beds;
+    }
+    
+    public void setBeds (int c) {
+        beds = c;
+    } 
+    
     public boolean[] getAvailability () {
         return availability;
     }
-
-    /**
-     * @param s
-     * @return The provider of the accommodation.
-     */
-
-    public AcProvider getAcProvider (Storage s) {
-        for (AcProvider temp : s.AcProviders) {
-            if (temp.name.equals(owner))
-                return temp;
-        }
-        return (AcProvider) null;
-    }
-
+    
     /**
      * @return The list of services of the accommodation.
      */
     
-    public ArrayList <String> getAcServicesList () {
-        return servicesList;
+    public boolean[] getAcServicesList () {
+        return services;
     }
 
     /**
@@ -103,8 +119,8 @@ private final String owner;
      * @param list
      */
     
-    public void setAcServicesList (ArrayList <String> list) {
-        servicesList = list;
+    public void setAcServicesList (boolean[] list) {
+        services = list;
     }
 
     /**
@@ -115,23 +131,6 @@ private final String owner;
     
     public double getAcFinalPrice (int days) {
         return price*days;
-    }
-
-    /**
-     * Prints accommodations services list.
-     */
-
-    public void printAcServicesList () {
-        System.out.println(servicesList);
-    }
-
-    /**
-     * Adds service.
-     * @param a The service.
-     */
-    
-    public void addAcService (String a) {
-        servicesList.add(a);
     }
 
     /**
@@ -149,17 +148,21 @@ private final String owner;
      * @return True if the service list contains the set of services and false otherwise.
      */
 
-    public boolean containsAcListOfServices (ArrayList <String> a) {
-        return servicesList.containsAll(a);
+    public boolean containsAcListOfServices (boolean[] a) {
+        for (int i=0; i<5; i++) {
+            if (a[i] != services[i])
+                return false;
+        }
+        return true;
     }
 
     /**
      * Removes a service.
-     * @param a The service.
+     * @param i
      */
     
-    public void removeAcService (String a) {
-        servicesList.remove(a);
+    public void removeAcService (int i) {
+        services[i] = false;
     }
 
     /**
@@ -170,13 +173,7 @@ private final String owner;
      */
     
     public boolean reservation(int beg, int end) {
-        if (this.checkAvailability(beg, end)) {
-            return true;
-        }
-        else {
-            System.out.println("No availability, please choose another set of dates.");
-            return false;
-        }
+    return this.checkAvailability(beg, end);
     }
 
     /**
@@ -205,22 +202,6 @@ private final String owner;
             for (int i = beg; i<end+1; i++) {
                 availability[i] = a;
             }
-    }
-
-    /**
-     * Prints full description.
-     */
-
-    public void printFullDescription () {
-        System.out.println("Accommodation's name: " + name);
-        System.out.println("Accommodation's owner: " + owner);
-        System.out.println("Accommodation's price: " + price);
-        System.out.println("Accommodation's squareMeters: " + squareMeters);
-        System.out.println("Accommodation's servicesList: ");
-        servicesList.forEach(temp -> {
-            System.out.println(temp);
-        });
-        
     }
 
 }

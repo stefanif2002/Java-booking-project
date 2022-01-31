@@ -3,21 +3,17 @@ Name :Steve
 Last Name :Ifoulis
 Address  :Markou Botsari 20
 Email :Stefanif100@gmail.com
-Phone Number :6988844455
+Phone Number :6988844456
 Date Of Birth :19/10/2002
-Username :stefanif2002
-Password :kalandra15d
+Username :client1
+Password :pass
 Id :725469
-Balance :180.0
-Pin :1967
+Balance :129.5
+Pin :2022
 Access :true
 Checked :true
-My Bookings :5
-Papaki1
-Papaki2
-Papaki3
-Papaki4
-Papaki5
+My Bookings :1
+Home1 - Steve
 
 Customer2
 Name :Dad
@@ -26,17 +22,12 @@ Address  :Markou Botsari 20
 Email :Kafou01@gmail.com
 Phone Number :6988844455
 Date Of Birth :14/01/1974
-Username :kafou01
-Password :kafou1974
+Username :clien2
+Password :pass
 Id :725469
 Balance :1500.0
 Pin :2022
 Access :true
 Checked :true
-My Bookings :5
-Papaki6
-Papaki7
-Papaki8
-Papaki9
-Papaki10
+My Bookings :0
 

@@ -1,13 +1,17 @@
 Accommodation Provider1
-Name :Mpaglamas
-Address  :papaki ston agro
-Email :oxoxokaiaxaxax@gmail.com
+Name :George
+Address  :Olgas 45
+Email :George@gmail.com
 Phone Number :6977744455
-Username :stefanif
-Password :kalandra15d
-Pin :1967
+Username :provider1
+Password :pass
+Pin :2022
 Access :true
 Checked :true
-My Accommodations :0
-My Bookings :0
+My Accommodations :3
+Home1
+Home2
+Home3
+My Bookings :1
+Home1 - Steve
 

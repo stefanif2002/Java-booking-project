@@ -2,7 +2,6 @@ package mybooking;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * The Storage class contains all the customers, accommodation providers, the manager
@@ -57,9 +56,48 @@ public HashMap <String, Accommodation> everyAccommodation;
         customers.add(a);
     }
     
+     public void addCustomer (String name, String lastName, String address, String email, String username, String password, String phoneNumber, String d, int i, double pay, int personalPin, boolean access, boolean checked) {
+        Customer e = new Customer (name, lastName, address, email, username, password, phoneNumber, d, i, pay, personalPin, access, checked);
+        customers.add(e);
+        manager.customersWaitingList.add(e);
+     }
+    
     public void addProvider (AcProvider a) {
         AcProviders.add(a);
     } 
+    
+    public void addProvider (String name, String address, String email, String username, String password, String phoneNumber, int personalPin, boolean access, boolean checked) {
+        AcProvider e = new AcProvider(name, address, email, username, password, phoneNumber, personalPin, access, checked);
+        AcProviders.add(e);
+        manager.AcProvidersWaitingList.add(e);
+    }
+    
+    public void addAccom (String a, double b, int c, int bed, String o, boolean[] list) {
+        this.getAcProvider(o).addAccom(a, b, c, bed, o, list, this);
+    }
+    
+    public void addBooking (String AcName, int beg, int end, int time, String customer) {
+        this.getCustomer(customer).placeBooking(everyAccommodation.get(AcName), beg, end, time, this);
+    }
+    
+    public void changeAccom (String ex, double price, int sqm, int bed, boolean services[]) {
+        everyAccommodation.get(ex).setPrice(price);
+        everyAccommodation.get(ex).setSquareMeters(sqm);
+        everyAccommodation.get(ex).setBeds(bed);
+        everyAccommodation.get(ex).setAcServicesList(services);
+    }
+    
+    public void changeAcProvider (String name, String address, String email, String phone) {
+        this.getAcProvider(name).setAddress(address);
+        this.getAcProvider(name).setEmail(email);
+        this.getAcProvider(name).setPhoneNumber(phone);
+    }
+    
+    public void changeCustomer (String name, String address, String email, String phone) {
+        this.getCustomer(name).setAddress(address);
+        this.getCustomer(name).setEmail(email);
+        this.getCustomer(name).setPhoneNumber(phone);
+    }
 
     /**
      * Removes the given customer form the customers list.
@@ -79,30 +117,14 @@ public HashMap <String, Accommodation> everyAccommodation;
         AcProviders.remove(temp);
     }
     
-    /**
-     * @return List of customers.
-     */
-    
-    public  ArrayList <Customer> getCostumers () {
-        return customers;
+    public void removeAccommodation (Accommodation tt) {
+        tt.getAcProvider(this).accomDelete(this, tt.getAcName());
     }
-
-    /**
-     * @return List of accommodation providers.
-     */
     
-    public  ArrayList <AcProvider> getAcProviders () {
-        return AcProviders;
+    public void removeBooking (Booking tt) {
+        tt.getCustomer(this).cancelBooking(tt, this);
     }
-
-    /**
-     * @return List of Bookings.
-     */
     
-    public  HashMap <String, Booking> getBookings () {
-        return everyBooking;
-    }
-
     /**
      * Checks whether the given username exists or not.
      * @param type The type of user for which check is needed (customer or provider).
@@ -114,7 +136,6 @@ public HashMap <String, Accommodation> everyAccommodation;
         if (type.equals("customer")) {
             for (Customer a : customers) {
                 if (a.getUsername().equals(name)) {
-                    System.out.println("Unfortunately a user with the specific username exists.");
                     return true;
                 }
             }
@@ -122,11 +143,34 @@ public HashMap <String, Accommodation> everyAccommodation;
         else if (type.equals("provider")) {
             for (AcProvider a : AcProviders) {
                 if (a.getUsername().equals(name)) {
-                    System.out.println("Unfortunately a user with the specific username exists.");
                     return true;
                 }
             }
         }
+        return false;
+    }
+    
+    public boolean checkUserPass (String temp, String user, String pass) {
+    switch (temp) {
+        case "manager" -> {
+            if (manager.checkLogInInfo(user, pass))
+                return true;
+        }
+        case "provider" -> {
+            for (AcProvider aa : AcProviders) {
+                if (aa.checkLogInInfo(user, pass))
+                    return true;
+            }
+        }
+        case "client" -> {
+            for (Customer aa : customers) {
+                if (aa.checkLogInInfo(user, pass))
+                    return true;
+            }
+        }
+        default -> {
+        }
+    }
         return false;
     }
 
@@ -144,31 +188,6 @@ public HashMap <String, Accommodation> everyAccommodation;
     }
 
     /**
-     * Accommodation search interface with no criteria.
-     */
-
-    public void AcSearch () {
-        if (this.checkAccom()) {
-            Scanner myScan = new Scanner(System.in);
-            String b;
-            for (AcProvider a : AcProviders) {
-                a.printForCustomer(this);
-            }
-            System.out.println("Which accommodation would you like to see info for: ");
-            b = myScan.nextLine();
-            if (AcSearch(b)) {
-                Accommodation temp = AcReturn(b);
-                temp.printFullDescription();
-            }
-            else
-                System.out.println("Accommodation not found.");
-        }
-        else {
-            System.out.println("Unfortunately there are no accommodations yet.");
-        }
-    }
-
-    /**
      * Checks whether an accommodation exists with the given name.
      * @param name The name of the accommodation.
      * @return True if there is an accommodation with the given name otherwise returns false.
@@ -178,110 +197,39 @@ public HashMap <String, Accommodation> everyAccommodation;
         return this.everyAccommodation.containsKey(name);
     }
 
-    /**
-     * Accommodation search interface with criteria.
-     * @param criteria The criteria.
-     */
-
-    public void AcSearch (ArrayList <String> criteria) {
-        if (this.checkAccom()) {
-            ArrayList <Accommodation> total = new ArrayList <> ();
-            for (AcProvider tempAcPr : AcProviders) {
-                total.addAll(tempAcPr.AcSearch(this, criteria));
-            }
-            if (total.isEmpty()) {
-                System.out.println("No accommodations found with the specific criteria.");
-                return;
-            }
-            this.printAcSearch(total);
-        }
-        else {
-            System.out.println("Unfortunately there are no accommodations yet.");
-        }
-    }
-
-    /**
-     * Searches and returns the accommodation with the given name.
-     * This method should only be used after the "AcSearch (String name)" method,
-     * so that it's ensured that the accommodation exists.
-     * @param name The name of the accommodation.
-     * @return The accommodation.
-     */
-
-    public Accommodation AcReturn (String name) {
-        return this.everyAccommodation.get(name);
-    }
-
-    /**
-     * Prints a list of accommodation names and
-     * then prints the full accommodation description for the one that the user picks.
-     * @param temp The list of accommodations.
-     */
     
-    private void printAcSearch (ArrayList <Accommodation> temp) {
-        Scanner myScan = new Scanner(System.in);
-        String b;
-        for (Accommodation accommodation : temp) {
-            System.out.println(accommodation.getAcName());
+    public AcProvider getAcProvider (String name) {
+        for (AcProvider temp : AcProviders) {
+            if (temp.getName().equals(name))
+                return temp;
         }
-        System.out.println("Which accommodation would you like to see info for: ");
-        b = myScan.nextLine();
-        for (Accommodation a: temp ) {
-            if (a.getAcName().equals(b))
-                a.printFullDescription();
-        }
-    }
-
-    /**
-     * Prints all the bookings that exist.
-     * @return True if there has been placed at least 1 booking and false if there is none.
-     */
-
-    public boolean printAllBookings () {
-        System.out.println();
-        int i = 0;
-        if (everyBooking.isEmpty()) {
-            System.out.println("There are no bookings placed yet.");
-            return false;
-        }
-        for (String temp : everyBooking.keySet()) {
-            i++;
-            System.out.print(i + ". ");
-            System.out.println(everyBooking.get(temp).bookingName);
-        }
-        return true;
-    }
-
-    /**
-     * Prints all the users of the given type (customer or accommodation provider).
-     * @param type The type of the user (customer or provider).
-     * @return true if at least 1 user, of the certain type, exists and false otherwise.
-     */
+        return null;
+    } 
     
-    public boolean printAllUsers (String type) {
-        int i = 0;
-        if (type.equals("customer")) {
-            if (customers.isEmpty()) {
-                System.out.println("There are no customers yet.");
-                return false;
-            }
-            for (Customer temp : customers) {
-                i++;
-                System.out.println(i + ". " + temp.getName());
-            }
+    public Customer getCustomer (String name) {
+        for (Customer temp : customers) {
+            if (temp.getName().equals(name))
+                return temp;
         }
-        else if (type.equals("provider")) {
-            if (AcProviders.isEmpty()) {
-                System.out.println("There are no accommodation providers yet.");
-                return false;
-            }
-            for (AcProvider temp : AcProviders) {
-                i++;
-                System.out.println(i + ". " +temp.getName());
-            }
+        return null;
+    } 
+    
+    public AcProvider getAcProviderByUsername (String name) {
+        for (AcProvider temp : AcProviders) {
+            if (temp.getUsername().equals(name))
+                return temp;
         }
-        return true;
-    }
+        return null;
+    } 
+    
+    public Customer getCustomerByUsername (String name) {
+        for (Customer temp : customers) {
+            if (temp.getUsername().equals(name))
+                return temp;
+        }
+        return null;
+    } 
+
 
 
 }

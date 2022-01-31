@@ -11,7 +11,7 @@ package mybooking;
  */
 public class SubUser extends User {
     
-protected final String address;
+protected String address;
 protected String phoneNumber;
 protected boolean access;
 protected boolean checked;
@@ -30,6 +30,10 @@ protected boolean checked;
 
     public String getAddress () {
         return address;
+    }
+    
+    public void setAddress (String address) {
+        this.address = address;
     }
 
     /**
@@ -79,15 +83,12 @@ protected boolean checked;
     
     public int statusReport () {
         if (access){
-            System.out.println("\nWelcome!");
             return 0;
         }
         else if (checked) {
-            System.out.println("Unfortunately your application was rejected, please try to re-enrol.");
             return 1;
         }
         else {
-            System.out.println("Unfortunately the manager hasn't yet confirmed your application.");
             return 2;
         }
     }
